@@ -1,0 +1,43 @@
+name: Exemplo Artifact
+run-name: Exemplo workflow para artifact, executado por ${{ github.actor }}
+on:
+  workflow_dispatch:
+
+env:
+    nome-artefato: artefatos-gerados
+    
+jobs:
+  upload-artifact:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Listagem de arquivos
+          run: ls -la
+        - name: Gerar alguns arquivos
+          run: |
+              mkdir artefatos
+              echo "Arquivo 1" > ./artefatos/arquivo1.txt
+              echo "Arquivo 2" > ./artefatos/arquivo2.txt
+        - name: Envio dos arquivos
+          uses: actions/upload-artifact@v4
+          id: upload-artifact
+          with:
+            name: ${{ env.nome-artefato }}
+            path: ./artefatos
+            retention-days: 1
+        - name: Listagem de arquivos
+          run: ls -la ./artefatos
+        - name : Endereço para obter os artefatos
+          run: echo "${{ steps.upload-artifact.outputs.artifact-server-url }}" # url para download do artefato
+
+  download-artifact:
+    needs: upload-artifact
+    runs-on: ubuntu-latest
+    steps:
+        - name: Listagem de arquivos
+          run: ls -la
+        - name: Download dos arquivos
+          uses: actions/download-artifact@v4
+          with:
+            name: ${{ env.nome-artefato }} # deve ser o mesmo nome do upload-artifact
+        - name: Listagem de arquivos
+          run: ls -la
