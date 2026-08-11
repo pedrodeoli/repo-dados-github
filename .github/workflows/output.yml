@@ -7,6 +7,8 @@ on:
 jobs:
   gerando_output:
     runs-on: ubuntu-latest
+    outputs:
+      output-shell: ${{ steps.exemplo_output.outputs.action_random }}
     steps:
       - name: Gerando output com shell
         id: exemplo_output
@@ -15,3 +17,9 @@ jobs:
           echo "action_random=$ACTION_RANDOM" >> $GITHUB_OUTPUT
       - name: Exibindo o output da action exemplo_output
         run: echo "${{ steps.exemplo_output.outputs.action_random }}"
+  exibindo_output:
+    needs: gerando_output
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exibindo o output da job gerando_output
+        run: echo "${{ needs.gerando_output.outputs.output-shell }}"
